@@ -10,6 +10,8 @@ class GolBoard : public QFrame
 
     public:
         GolBoard(QWidget *parent = 0);
+        QSize sizeHint() const;
+        QSize minimumSizeHint() const;
 
     public slots:
         void start();
@@ -22,14 +24,16 @@ class GolBoard : public QFrame
         void timerEvent(QTimerEvent *event);
 
     private:
-        enum { BoardWidth = 20, BoardHeight = 20 };
+        enum { BoardWidth = 100, BoardHeight = 100, Cellsize = 5 };
 
-        int timeOutTime() { return 1000; }
-        int squareWidth() { return contentsRect().width() / BoardWidth; }
-        int squareHeight() { return contentsRect().height() / BoardHeight; }
+        /* int squareWidth() { return contentsRect().width() / BoardWidth; } */
+        /* int squareHeight() { return contentsRect().height() / BoardHeight; } */
+        int timeoutTime() { return 1000; }
         void drawCell(QPainter &painter, int x, int y);
 
         QBasicTimer timer;
+        bool isPaused;
+        bool isStarted;
 };
 
 #endif

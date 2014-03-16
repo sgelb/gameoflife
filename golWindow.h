@@ -5,6 +5,7 @@
 #include <QWidget>
 
 class QPushButton;
+class QSpinBox;
 class GolBoard;
 
 class GolWindow : public QWidget
@@ -20,6 +21,7 @@ private:
     QPushButton *pauseBtn;
     QPushButton *clearBtn;
     QPushButton *populateBtn;
+    QSpinBox *popRatioBox;
 };
 
 #endif
