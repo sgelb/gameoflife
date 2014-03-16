@@ -12,6 +12,8 @@ GolBoard::GolBoard(QWidget *parent) : QFrame(parent)
     isStarted = false;
 }
 
+/* TODO: make sure that board has right w*h-ration when resizing */
+
 QSize GolBoard::sizeHint() const
 {
     return QSize(BoardWidth*Cellsize + frameWidth() * 2,
@@ -23,6 +25,8 @@ QSize GolBoard::minimumSizeHint() const
     return QSize(BoardWidth*Cellsize + frameWidth() * 2,
                  BoardHeight*Cellsize + frameWidth() * 2);
 }
+
+/* TODO: create start/pause-toggle button */
 
 void GolBoard::start() {
     if (isPaused) {
@@ -46,6 +50,7 @@ void GolBoard::pause() {
 }
 
 void GolBoard::populate() {
+/* TODO: create Array */
 }
 
 void GolBoard::clear() {

@@ -1,3 +1,5 @@
 bak/*
 *.o
 moc_*
+Makefile
+game_of_life
