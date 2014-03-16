@@ -16,12 +16,17 @@ GolWindow::GolWindow()
     connect(populateBtn, SIGNAL(clicked()), board, SLOT(populate()));
     connect(clearBtn, SIGNAL(clicked()), board, SLOT(clear()));
 
+    QGroupBox *groupBox = new QGroupBox;
+    QVBoxLayout *vbox = new QVBoxLayout;
+    vbox->addWidget(startBtn);
+    vbox->addWidget(pauseBtn);
+    vbox->addWidget(populateBtn);
+    vbox->addWidget(clearBtn);
+    groupBox->setLayout(vbox);
+
     QGridLayout *layout = new QGridLayout;
-    layout->addWidget(startBtn, 0, 0);
-    layout->addWidget(pauseBtn, 1, 0);
-    layout->addWidget(populateBtn, 2, 0);
-    layout->addWidget(clearBtn, 3, 0);
-    layout->addWidget(board, 0, 1, 4, 1);
+    layout->addWidget(groupBox, 0, 0);
+    layout->addWidget(board, 0, 1, 4, 4);
     setLayout(layout);
 
     setWindowTitle(tr("Game of Life"));
