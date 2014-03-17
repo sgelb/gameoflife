@@ -11,6 +11,8 @@ GolBoard::GolBoard(QWidget *parent) : QFrame(parent)
     isPaused = false;
     isStarted = false;
     iteration = 0;
+    timeoutTime = 500;
+    popRatio = 0.4f;
 }
 
 /* TODO: make sure that board has right w*h-ration when resizing */
@@ -35,7 +37,7 @@ void GolBoard::start() {
         return;
     }
     isStarted = true;
-    timer.start(timeoutTime(), this);
+    timer.start(timeoutTime, this);
 }
 
 void GolBoard::pause() {
@@ -46,7 +48,7 @@ void GolBoard::pause() {
     if (isPaused) {
         timer.stop();
     } else {
-        timer.start(timeoutTime(), this);
+        timer.start(timeoutTime, this);
     }
     update();
 }
@@ -54,17 +56,22 @@ void GolBoard::pause() {
 void GolBoard::populate() {
     seed = (int) time(0);
     std::srand(seed);
-    double p = 0.6f;
     for (int i=0; i<BoardWidth*BoardHeight; i++) {
-        grid.insert(i, (rand() < p * ((double)RAND_MAX + 1.0)));
+        grid.insert(i, (rand() < popRatio * ((double)RAND_MAX + 1.0)));
     }
     update();
 }
 
 void GolBoard::clear() {
     for (int i=0; i<BoardWidth*BoardHeight; i++) {
-        grid.insert(i, 0);
+        grid.replace(i, 0);
     }
+    isStarted = false;
+    isPaused = false;
+    timer.stop();
+    iteration = 0;
+    emit changeLabel("iterationLabel", QString("Iteration: %1").arg(iteration));
+    emit changeLabel("aliveCellsLabel", QString("Alive cells: 0"));
     update();
 }
 
@@ -130,16 +137,16 @@ void GolBoard::iterate() {
     for (int n=0; n<grid.size(); n++) { 
         int ncount = neighbor_count(n);
 
-        if (grid.at(n) && (2 == ncount || 3 == ncount)) {
+        if (0 < grid.at(n) && (2 == ncount || 3 == ncount)) {
             /* Any live cell with two or three live neighbours
              * lives on */
-            tmp_grid.insert(n, 1);
+            tmp_grid.replace(n, 1);
             aliveCells++;
         }
-        else if (!grid.at(n) && 3 == ncount) {
-            /* Any cell with exactly three live neighbours becomes
+        else if (0 == grid.at(n) && 3 == ncount) {
+            /* Any dead cell with exactly three live neighbours becomes
              * alive */
-            tmp_grid.insert(n, 1);
+            tmp_grid.replace(n, 1);
             aliveCells++;
         }
     }
@@ -158,9 +165,17 @@ void GolBoard::drawCell(QPainter &painter, int x, int y) {
 void GolBoard::timerEvent(QTimerEvent *event) {
     if (event->timerId() == timer.timerId()) {
         iterate();
+        timer.start(timeoutTime, this);
         update();
-        timer.start(timeoutTime(), this);
     } else {
         QFrame::timerEvent(event);
     }
+}
+
+void GolBoard::setTimeoutTime(int timeout) {
+    timeoutTime = 1000/timeout;
+}
+
+void GolBoard::setPopRatio(int p) {
+    popRatio = p / 100.0f;
 }

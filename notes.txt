@@ -2,10 +2,10 @@ https://qt-project.org/doc/qt-5.0/qtwidgets/widgets-tetrix.html
 
 ### TODO
 
-- set speed
-- set probability
 - set board size
-- save/load board
-- statistics
-- different colors
 - resize board
+- forward one iteration
+- paint on board
+- save/load board
+- history?
+- find bug

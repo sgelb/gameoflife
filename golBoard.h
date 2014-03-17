@@ -20,6 +20,8 @@ class GolBoard : public QFrame
         void pause();
         void populate();
         void clear();
+        void setTimeoutTime(int timeout);
+        void setPopRatio(int ratio);
 
     signals:
         void changeLabel(QString label, QString text);
@@ -29,9 +31,8 @@ class GolBoard : public QFrame
         void timerEvent(QTimerEvent *event);
 
     private:
-        enum { BoardWidth = 100, BoardHeight = 100, Cellsize = 5 };
+        enum { BoardWidth = 100, BoardHeight = 100, Cellsize = 8 };
 
-        int timeoutTime() { return 500; }
         void drawCell(QPainter &painter, int x, int y);
         void iterate();
         int neighbor_count(int);
@@ -41,8 +42,10 @@ class GolBoard : public QFrame
         QString iterationText;
         int seed;
         int iteration;
+        double popRatio;
         bool isPaused;
         bool isStarted;
+        int timeoutTime;
 };
 
 #endif

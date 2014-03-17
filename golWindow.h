@@ -20,6 +20,7 @@ public:
 
 public slots:
     void changeLabel(QString, QString);
+    void changeSliderLabel(int);
 
 private:
     GolBoard *board;
@@ -31,6 +32,7 @@ private:
     QSlider *speedSlider;
     QLabel *iterationLabel;
     QLabel *aliveCellsLabel;
+    QLabel *speedLabel;
 };
 
 #endif

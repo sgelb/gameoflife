@@ -10,16 +10,15 @@ GolWindow::GolWindow()
     pauseBtn = new QPushButton(tr("&Pause"));
     populateBtn = new QPushButton(tr("&Random populate"));
     clearBtn = new QPushButton(tr("&Clear"));
-    popRatioBox = new QSpinBox;
-    popRatioBox->setRange(0, 100);
-    popRatioBox->setSingleStep(1);
-    popRatioBox->setValue(50);
-    popRatioBox->setSuffix("%");
 
     QGroupBox *groupBox = new QGroupBox("Controls");
     QVBoxLayout *vbox = new QVBoxLayout;
-    QLabel *speedLabel = new QLabel(tr("Speed (X iterations/sec)"));
+    speedLabel = new QLabel(tr("Speed (1 iterations/sec)"));
     speedSlider = new QSlider(Qt::Horizontal);
+    speedSlider->setTickInterval(1);
+    speedSlider->setMinimum(1);
+    speedSlider->setMaximum(100);
+
     vbox->addWidget(startBtn);
     vbox->addWidget(pauseBtn);
     vbox->addWidget(populateBtn);
@@ -28,18 +27,28 @@ GolWindow::GolWindow()
     vbox->addWidget(speedSlider);
     groupBox->setLayout(vbox);
 
-    connect(startBtn, SIGNAL(clicked()), board, SLOT(start()));
-    connect(pauseBtn, SIGNAL(clicked()), board, SLOT(pause()));
-    connect(populateBtn, SIGNAL(clicked()), board, SLOT(populate()));
-    connect(clearBtn, SIGNAL(clicked()), board, SLOT(clear()));
-
+    connect(startBtn, &QPushButton::clicked, board, &GolBoard::start);
+    connect(pauseBtn, &QPushButton::clicked, board, &GolBoard::pause);
+    connect(populateBtn, &QPushButton::clicked, board, &GolBoard::populate);
+    connect(clearBtn, &QPushButton::clicked, board, &GolBoard::clear);
+    connect(speedSlider, &QSlider::valueChanged, board, &GolBoard::setTimeoutTime);
+    connect(speedSlider, &QSlider::valueChanged, this, &GolWindow::changeSliderLabel);
 
     QGroupBox *groupBox2 = new QGroupBox(tr("Preferences"));
     QVBoxLayout *vbox2 = new QVBoxLayout;
     QLabel *popRatioLabel = new QLabel(tr("Initial ratio of alive cells"));
+    popRatioBox = new QSpinBox;
+    popRatioBox->setRange(0, 100);
+    popRatioBox->setSingleStep(1);
+    popRatioBox->setValue(30);
+    popRatioBox->setSuffix("%");
     vbox2->addWidget(popRatioLabel);
     vbox2->addWidget(popRatioBox);
     groupBox2->setLayout(vbox2);
+
+    /* new connect syntax doesn't work with overloaded methods, usign old syntax */
+    /* connect(popRatioBox, &QSpinBox::valueChanged, board, &GolBoard::setPopRatio); */
+    connect(popRatioBox, SIGNAL(valueChanged(int)), board, SLOT(setPopRatio(int)));
 
 
     QGroupBox *groupBox3 = new QGroupBox(tr("Statistics"));
@@ -50,7 +59,7 @@ GolWindow::GolWindow()
     vbox3->addWidget(aliveCellsLabel);
     groupBox3->setLayout(vbox3);
 
-    connect(board, SIGNAL(changeLabel(QString, QString)), this, SLOT(changeLabel(QString, QString)));
+    connect(board, &GolBoard::changeLabel, this, &GolWindow::changeLabel);
 
 
     QGridLayout *layout = new QGridLayout;
@@ -62,6 +71,10 @@ GolWindow::GolWindow()
 
     setWindowTitle(tr("Game of Life"));
     /* resize(550, 370); */
+}
+
+void GolWindow::changeSliderLabel(int value) {
+    speedLabel->setText(QString(tr("Speed (%1 iterations/sec)").arg(value)));
 }
 
 void GolWindow::changeLabel(QString label, QString text) {
