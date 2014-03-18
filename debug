@@ -1,0 +1,6 @@
+gdb
+file game_of_life
+run
+bt show
+
+golBoard:143: index out of range

@@ -26,4 +26,3 @@ Simple implementation of Conways's »Game of Life«, written in C++ and using QT
 - save history to forward/backward a few iterations
 - create patterns by drawing on board
 - save/load boards
-- debug

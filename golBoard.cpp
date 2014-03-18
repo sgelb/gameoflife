@@ -56,15 +56,16 @@ void GolBoard::pause() {
 void GolBoard::populate() {
     seed = (int) time(0);
     std::srand(seed);
+    grid.clear();
     for (int i=0; i<BoardWidth*BoardHeight; i++) {
-        grid.insert(i, (rand() < popRatio * ((double)RAND_MAX + 1.0)));
+        grid << (rand() < popRatio * ((double)RAND_MAX + 1.0));
     }
     update();
 }
 
 void GolBoard::clear() {
     for (int i=0; i<BoardWidth*BoardHeight; i++) {
-        grid.replace(i, 0);
+        grid[i] = 0;
     }
     isStarted = false;
     isPaused = false;
@@ -81,7 +82,7 @@ void GolBoard::paintEvent(QPaintEvent *event) {
     /* QRect rect = contentsRect(); */
     for (int i=0; i < BoardHeight; i++) {
         for (int j=0; j < BoardWidth; j++) {
-            if (grid.value(i*BoardWidth + j)) {
+            if (grid[i*BoardWidth + j]) {
                 drawCell(painter, i, j);
             }
         }
@@ -129,10 +130,10 @@ int GolBoard::neighbor_count(int n) {
 }
 
 void GolBoard::iterate() {
-    QList<int> tmp_grid;
     int aliveCells = 0;
+    tmp_grid.clear();
     for (int i=0; i<BoardWidth*BoardHeight; i++) {
-        tmp_grid.insert(i, 0);
+        tmp_grid << 0;
     }
     for (int n=0; n<grid.size(); n++) { 
         int ncount = neighbor_count(n);
@@ -140,13 +141,13 @@ void GolBoard::iterate() {
         if (0 < grid.at(n) && (2 == ncount || 3 == ncount)) {
             /* Any live cell with two or three live neighbours
              * lives on */
-            tmp_grid.replace(n, 1);
+            tmp_grid[n] = 1;
             aliveCells++;
         }
         else if (0 == grid.at(n) && 3 == ncount) {
             /* Any dead cell with exactly three live neighbours becomes
              * alive */
-            tmp_grid.replace(n, 1);
+            tmp_grid[n] = 1;
             aliveCells++;
         }
     }

@@ -6,6 +6,7 @@ QT += widgets
 TEMPLATE = app
 TARGET = game_of_life
 INCLUDEPATH += .
+CONFIG += debug
 
 # Input
 HEADERS += golBoard.h golWindow.h

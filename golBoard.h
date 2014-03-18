@@ -39,6 +39,7 @@ class GolBoard : public QFrame
 
         QBasicTimer timer;
         QList<int> grid;
+        QList<int> tmp_grid;
         QString iterationText;
         int seed;
         int iteration;
