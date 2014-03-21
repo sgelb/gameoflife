@@ -21,6 +21,7 @@ public:
 public slots:
     void changeLabel(QString, QString);
     void changeSliderLabel(int);
+    void checkPauseBtn();
 
 private:
     GolBoard *board;

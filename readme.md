@@ -19,10 +19,11 @@ Simple implementation of Conways's »Game of Life«, written in C++ and using QT
 
 #### Todo
 
-- refactor game logic
-- disable buttons for slightly better ux
-- custom board size
-- resizable window/board frame
-- save history to forward/backward a few iterations
 - create patterns by drawing on board
+- resizable window/board frame
+- custom board size
+- toggle wrap
+- refactor game logic
+- save history to forward/backward a few iterations
+- prefab patterns
 - save/load boards

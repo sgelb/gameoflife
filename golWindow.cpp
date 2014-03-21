@@ -7,14 +7,20 @@ GolWindow::GolWindow()
 {
     board = new GolBoard;
     startBtn = new QPushButton(tr("&Start"));
+    startBtn->setCheckable(true);
+    startBtn->setAutoExclusive(true);
     pauseBtn = new QPushButton(tr("&Pause"));
-    populateBtn = new QPushButton(tr("&Random populate"));
+    pauseBtn->setCheckable(true);
+    pauseBtn->setChecked(true);
+    pauseBtn->setAutoExclusive(true);
+    populateBtn = new QPushButton(tr("&Random"));
     clearBtn = new QPushButton(tr("&Clear"));
 
     QGroupBox *groupBox = new QGroupBox("Controls");
     QVBoxLayout *vbox = new QVBoxLayout;
-    speedLabel = new QLabel(tr("Speed (1 iterations/sec)"));
+    speedLabel = new QLabel(tr("25 iterations/sec"));
     speedSlider = new QSlider(Qt::Horizontal);
+    speedSlider->setValue(25);
     speedSlider->setTickInterval(1);
     speedSlider->setMinimum(1);
     speedSlider->setMaximum(100);
@@ -36,14 +42,32 @@ GolWindow::GolWindow()
 
     QGroupBox *groupBox2 = new QGroupBox(tr("Preferences"));
     QVBoxLayout *vbox2 = new QVBoxLayout;
+
+    /* TODO: connect gridSize */
+
+    QLabel *gridSizeLabel = new QLabel(tr("Grid size"));
+    QHBoxLayout *hbox = new QHBoxLayout;
+    QLineEdit *xSizeEdit = new QLineEdit("100");
+    xSizeEdit->setMaxLength(3);
+    QLineEdit *ySizeEdit = new QLineEdit("100");
+    ySizeEdit->setMaxLength(3);
+    hbox->addWidget(xSizeEdit);
+    hbox->addWidget(new QLabel(tr("x")));
+    hbox->addWidget(ySizeEdit);
+    
     QLabel *popRatioLabel = new QLabel(tr("Initial ratio of alive cells"));
     popRatioBox = new QSpinBox;
     popRatioBox->setRange(0, 100);
     popRatioBox->setSingleStep(1);
     popRatioBox->setValue(30);
     popRatioBox->setSuffix("%");
+    QPushButton *setBtn = new QPushButton(tr("Set"));
+
+    vbox2->addWidget(gridSizeLabel);
+    vbox2->addLayout(hbox);
     vbox2->addWidget(popRatioLabel);
     vbox2->addWidget(popRatioBox);
+    vbox2->addWidget(setBtn);
     groupBox2->setLayout(vbox2);
 
     /* new connect syntax doesn't work with overloaded methods, usign old syntax */
@@ -53,28 +77,32 @@ GolWindow::GolWindow()
 
     QGroupBox *groupBox3 = new QGroupBox(tr("Statistics"));
     QVBoxLayout *vbox3 = new QVBoxLayout;
-    iterationLabel = new QLabel(tr("Iteration: 0"));
+    iterationLabel = new QLabel(tr("Iterations: 0"));
     aliveCellsLabel = new QLabel(tr("Alive cells: 0"));
     vbox3->addWidget(iterationLabel);
     vbox3->addWidget(aliveCellsLabel);
     groupBox3->setLayout(vbox3);
 
     connect(board, &GolBoard::changeLabel, this, &GolWindow::changeLabel);
+    connect(board, &GolBoard::checkPauseBtn, this, &GolWindow::checkPauseBtn);
 
+    QVBoxLayout *vbox4 = new QVBoxLayout;
+    vbox4->addWidget(groupBox, 0, Qt::AlignTop);
+    vbox4->addWidget(groupBox2, 0, Qt::AlignTop);
+    vbox4->addWidget(groupBox3, 0, Qt::AlignTop);
+    vbox4->insertStretch(-1, 0);
+    vbox4->setSizeConstraint(QLayout::SetFixedSize);
 
-    QGridLayout *layout = new QGridLayout;
-    layout->addWidget(groupBox, 0, 0);
-    layout->addWidget(groupBox2, 1, 0);
-    layout->addWidget(groupBox3, 2, 0);
-    layout->addWidget(board, 0, 1, 4, 4);
+    QHBoxLayout *layout = new QHBoxLayout;
+    layout->addLayout(vbox4);
+    layout->addWidget(board);
     setLayout(layout);
-
+    resize(0,0);
     setWindowTitle(tr("Game of Life"));
-    /* resize(550, 370); */
 }
 
 void GolWindow::changeSliderLabel(int value) {
-    speedLabel->setText(QString(tr("Speed (%1 iterations/sec)").arg(value)));
+    speedLabel->setText(QString(tr("%1 iterations/sec").arg(value)));
 }
 
 void GolWindow::changeLabel(QString label, QString text) {
@@ -86,4 +114,8 @@ void GolWindow::changeLabel(QString label, QString text) {
         aliveCellsLabel->setText(text);
         return;
     }
+}
+
+void GolWindow::checkPauseBtn() {
+    pauseBtn->setChecked(true);
 }
