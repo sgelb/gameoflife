@@ -6,9 +6,10 @@
 GolBoard::GolBoard(QWidget *parent) : QFrame(parent)
 {
     setFrameStyle(QFrame::Panel);
+    setMouseTracking(true);
     height = 200;
     width = 200;
-    cellsize = 5;
+    cellsize = 4;
     resize(width*cellsize+2*frameWidth(), height*cellsize+2*frameWidth());
     populate();
     isPaused = true;
@@ -187,6 +188,11 @@ void GolBoard::mousePressEvent(QMouseEvent *event) {
         }
         update();
     }
+}
+void GolBoard::mouseMoveEvent(QMouseEvent *event){
+    int x = event->x()/cellsize;
+    int y = event->y()/cellsize;
+    QToolTip::showText(event->globalPos(), QString(tr("(%1,%2)").arg(x).arg(y)));
 }
 
 void GolBoard::setTimeoutTime(int timeout) {

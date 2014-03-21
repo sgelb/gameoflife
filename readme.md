@@ -16,10 +16,10 @@ Simple implementation of Conways's »Game of Life«, written in C++ and using QT
 - adjustable ratio of alive cells for population
 - adjustable speed of iterations
 - statistics (number of iterations and cells alive)
+- create patterns by drawing on board
 
 #### Todo
 
-- create patterns by drawing on board
 - resizable window/board frame
 - custom board size
 - toggle wrap
