@@ -6,9 +6,9 @@
 GolBoard::GolBoard(QWidget *parent) : QFrame(parent)
 {
     setFrameStyle(QFrame::Panel);
-    height = 250;
-    width = 250;
-    cellsize = 3;
+    height = 200;
+    width = 200;
+    cellsize = 5;
     resize(width*cellsize+2*frameWidth(), height*cellsize+2*frameWidth());
     populate();
     isPaused = true;
@@ -30,12 +30,7 @@ QSize GolBoard::minimumSizeHint() const
     return QSize(width*cellsize+1, height*cellsize+1);
 }
 
-
-/* TODO: create start/pause-toggle button */
-
 void GolBoard::start() {
-    /* TODO: disable startBtn */
-    /* TODO: enable pauseBtn*/
     if (isPaused) {
         isPaused = false;
     }
@@ -43,8 +38,6 @@ void GolBoard::start() {
 }
 
 void GolBoard::pause() {
-    /* TODO: enable startBtn */
-    /* TODO: disable pauseBtn*/
     if (isPaused) {
         return;
     }
@@ -175,6 +168,25 @@ void GolBoard::resizeEvent(QResizeEvent *event) {
     int t = std::min(s.width(), s.height());
     cellsize = t/width;
     resize(width*cellsize+2*frameWidth(), height*cellsize+2*frameWidth());
+}
+
+void GolBoard::mousePressEvent(QMouseEvent *event) {
+    if (event->buttons() & Qt::LeftButton) {
+        int x = event->x()/cellsize;
+        int y = (event->y()-frameWidth())/cellsize;
+        int idx = (x*width + y);
+
+        if (idx < 0 || idx >= width*height)
+            return;
+
+        if (grid[idx]) {
+            grid[idx] = 0;
+        }
+        else {
+            grid[idx] = 1;
+        }
+        update();
+    }
 }
 
 void GolBoard::setTimeoutTime(int timeout) {
