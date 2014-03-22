@@ -28,7 +28,7 @@ QSize GolBoard::sizeHint() const
 
 QSize GolBoard::minimumSizeHint() const
 {
-    return QSize(width*cellsize+1, height*cellsize+1);
+    return QSize(width*cellsize+2*frameWidth(), height*cellsize+2*frameWidth());
 }
 
 void GolBoard::start() {
@@ -175,7 +175,8 @@ void GolBoard::resizeEvent(QResizeEvent *event) {
 
 void GolBoard::mousePressEvent(QMouseEvent *event) {
     if (event->buttons() & Qt::LeftButton) {
-        int x = event->x()/cellsize;
+        /* FIXME: rundungsfehler? */
+        int x = (event->x()-frameWidth())/cellsize;
         int y = (event->y()-frameWidth())/cellsize;
         int idx = (x*width + y);
 
@@ -191,10 +192,17 @@ void GolBoard::mousePressEvent(QMouseEvent *event) {
         update();
     }
 }
+
 void GolBoard::mouseMoveEvent(QMouseEvent *event){
-    int x = event->x()/cellsize;
-    int y = event->y()/cellsize;
+    int x = (event->x()-frameWidth())/cellsize;
+    int y = (event->y()-frameWidth())/cellsize;
     QToolTip::showText(event->globalPos(), QString(tr("(%1,%2)").arg(x).arg(y)));
+}
+
+void GolBoard::wheelEvent(QWheelEvent *event) {
+    int tmp_cellsize = cellsize + (event->angleDelta()/120).y();
+    cellsize = std::min(size().width()/width, std::max(1, tmp_cellsize));
+    update();
 }
 
 void GolBoard::setTimeoutTime(int timeout) {

@@ -36,6 +36,7 @@ class GolBoard : public QFrame
         void resizeEvent(QResizeEvent * event);
         void mouseMoveEvent(QMouseEvent *event);
         void mousePressEvent(QMouseEvent *event);
+        void wheelEvent(QWheelEvent *event);
 
     private:
         /* enum { BoardWidth = 100, BoardHeight = 100, Cellsize = 5 }; */
