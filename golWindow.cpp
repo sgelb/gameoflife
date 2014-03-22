@@ -54,7 +54,7 @@ GolWindow::GolWindow()
     hbox->addWidget(xSizeEdit);
     hbox->addWidget(new QLabel(tr("x")));
     hbox->addWidget(ySizeEdit);
-    
+
     QLabel *popRatioLabel = new QLabel(tr("Initial ratio of alive cells"));
     popRatioBox = new QSpinBox;
     popRatioBox->setRange(0, 100);

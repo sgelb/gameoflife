@@ -40,6 +40,8 @@ void GolBoard::start() {
 
 void GolBoard::pause() {
     if (isPaused) {
+        iterate();
+        update();
         return;
     }
     isPaused = true;
