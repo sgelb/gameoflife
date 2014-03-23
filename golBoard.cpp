@@ -9,7 +9,7 @@ GolBoard::GolBoard(QWidget *parent) : QFrame(parent)
     setMouseTracking(true);
     height = 200;
     width = 200;
-    cellsize = 4;
+    cellsize = 3;
     resize(width*cellsize+2*frameWidth(), height*cellsize+2*frameWidth());
     populate();
     isPaused = true;
@@ -19,8 +19,6 @@ GolBoard::GolBoard(QWidget *parent) : QFrame(parent)
     std::srand(time(0));
 }
 
-/* TODO: make sure that board has right w*h-ration when resizing */
-
 QSize GolBoard::sizeHint() const
 {
     return QSize(width*cellsize+2*frameWidth(), height*cellsize+2*frameWidth());
@@ -28,7 +26,7 @@ QSize GolBoard::sizeHint() const
 
 QSize GolBoard::minimumSizeHint() const
 {
-    return QSize(width*cellsize+2*frameWidth(), height*cellsize+2*frameWidth());
+    return QSize(width+2*frameWidth(), height+2*frameWidth());
 }
 
 void GolBoard::start() {
@@ -167,17 +165,15 @@ void GolBoard::timerEvent(QTimerEvent *event) {
 }
 
 void GolBoard::resizeEvent(QResizeEvent *event) {
-    /* FIXME: zooming in fullscreen fails */
-    /* see http://qt-project.org/doc/qt-5/qtwidgets-desktop-screenshot-example.html */
     QSize s = event->size();
     int t = std::min(s.width(), s.height());
     cellsize = t/width;
     resize(width*cellsize+2*frameWidth(), height*cellsize+2*frameWidth());
+    update();
 }
 
 void GolBoard::mousePressEvent(QMouseEvent *event) {
     if (event->buttons() & Qt::LeftButton) {
-        /* FIXME: rundungsfehler? */
         int x = (event->x()-frameWidth())/cellsize;
         int y = (event->y()-frameWidth())/cellsize;
         int idx = (x*width + y);
