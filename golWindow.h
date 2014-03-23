@@ -10,6 +10,7 @@ class GolBoard;
 class QSlider;
 class QString;
 class QLabel;
+class QScreen;
 
 class GolWindow : public QWidget
 {

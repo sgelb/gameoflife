@@ -21,6 +21,7 @@ Simple implementation of Conways's »Game of Life«, written in C++ and using QT
 
 #### Todo
 
+- zoom doesn't work in fullscreen mode
 - custom board size
 - resizable window/board frame
 - toggle wrap

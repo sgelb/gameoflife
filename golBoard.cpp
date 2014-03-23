@@ -167,6 +167,8 @@ void GolBoard::timerEvent(QTimerEvent *event) {
 }
 
 void GolBoard::resizeEvent(QResizeEvent *event) {
+    /* FIXME: zooming in fullscreen fails */
+    /* see http://qt-project.org/doc/qt-5/qtwidgets-desktop-screenshot-example.html */
     QSize s = event->size();
     int t = std::min(s.width(), s.height());
     cellsize = t/width;

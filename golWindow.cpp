@@ -1,11 +1,15 @@
 #include <QtWidgets>
 
+#include <iostream>
 #include "golWindow.h"
 #include "golBoard.h"
 
 GolWindow::GolWindow()
 {
+    /* TODO: refactor */
     board = new GolBoard;
+    QWidget *sidebar = new QWidget;
+
     startBtn = new QPushButton(tr("&Start"));
     startBtn->setCheckable(true);
     startBtn->setAutoExclusive(true);
@@ -86,19 +90,19 @@ GolWindow::GolWindow()
     connect(board, &GolBoard::changeLabel, this, &GolWindow::changeLabel);
     connect(board, &GolBoard::checkPauseBtn, this, &GolWindow::checkPauseBtn);
 
-    QVBoxLayout *vbox4 = new QVBoxLayout;
+    QVBoxLayout *vbox4 = new QVBoxLayout(sidebar);
     vbox4->addWidget(groupBox, 0, Qt::AlignTop);
     vbox4->addWidget(groupBox2, 0, Qt::AlignTop);
     vbox4->addWidget(groupBox3, 0, Qt::AlignTop);
     vbox4->insertStretch(-1, 0);
-    vbox4->setSizeConstraint(QLayout::SetFixedSize);
+
 
     QHBoxLayout *layout = new QHBoxLayout;
-    layout->addLayout(vbox4);
+    sidebar->setFixedWidth(sidebar->minimumSizeHint().width());
+    layout->addWidget(sidebar);
     layout->addWidget(board);
     setLayout(layout);
-    resize(0,0);
-    setWindowTitle(tr("Game of Life"));
+    setWindowTitle(tr("Conway\'s Game of Life"));
 }
 
 void GolWindow::changeSliderLabel(int value) {
