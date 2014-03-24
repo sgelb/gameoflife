@@ -9,6 +9,8 @@ Simple implementation of Conways's »Game of Life«, written in C++ and using QT
 3. Any live cell with more than three live neighbours dies, as if by overcrowding.
 4. Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
 
+![ScreenShot](/screenshot.png)
+
 #### Features
 
 - start, pause and clear game
@@ -26,3 +28,4 @@ Simple implementation of Conways's »Game of Life«, written in C++ and using QT
 - toggle wrap
 - prefabricated patterns
 - save/load boards
+
