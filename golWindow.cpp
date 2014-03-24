@@ -6,10 +6,59 @@
 
 GolWindow::GolWindow()
 {
-    /* TODO: refactor */
     board = new GolBoard;
     QWidget *sidebar = new QWidget;
 
+    /* Controls */
+    QGroupBox *controlsBox = new QGroupBox("Controls");
+    createControlsBox(controlsBox);
+
+    /* Preferences */
+    QGroupBox *prefsBox = new QGroupBox(tr("Preferences"));
+    createPrefsBox(prefsBox);
+
+    /* Statistics */
+    QGroupBox *statsBox = new QGroupBox(tr("Statistics"));
+    createStatsBox(statsBox);
+
+    /* put sidebar together */
+    QVBoxLayout *vbox = new QVBoxLayout(sidebar);
+    vbox->addWidget(controlsBox, 0, Qt::AlignTop);
+    vbox->addWidget(prefsBox, 0, Qt::AlignTop);
+    vbox->addWidget(statsBox, 0, Qt::AlignTop);
+    vbox->insertStretch(-1, 0);
+
+    /* create signals */
+    createSignals();
+
+    /* put everything together */
+    QHBoxLayout *layout = new QHBoxLayout;
+    sidebar->setFixedWidth(sidebar->minimumSizeHint().width());
+    layout->addWidget(sidebar);
+    layout->addWidget(board);
+    setLayout(layout);
+    setWindowTitle(tr("Conway\'s Game of Life"));
+}
+
+void GolWindow::changeLabel(QString label, QString text) {
+    if (0 == QString::compare(label, "iterationLabel")) {
+        iterationLabel->setText(text);
+        return;
+    }
+    if (0 == QString::compare(label, "aliveCellsLabel")) {
+        aliveCellsLabel->setText(text);
+        return;
+    }
+}
+void GolWindow::changeSliderLabel(int value) {
+    speedLabel->setText(QString(tr("%1 iterations/sec").arg(value)));
+}
+
+void GolWindow::checkPauseBtn() {
+    pauseBtn->setChecked(true);
+}
+
+void GolWindow::createControlsBox(QGroupBox *controlsBox) {
     startBtn = new QPushButton(tr("&Start"));
     startBtn->setCheckable(true);
     startBtn->setAutoExclusive(true);
@@ -20,7 +69,6 @@ GolWindow::GolWindow()
     populateBtn = new QPushButton(tr("&Random"));
     clearBtn = new QPushButton(tr("&Clear"));
 
-    QGroupBox *groupBox = new QGroupBox("Controls");
     QVBoxLayout *vbox = new QVBoxLayout;
     speedLabel = new QLabel(tr("25 iterations/sec"));
     speedSlider = new QSlider(Qt::Horizontal);
@@ -35,20 +83,13 @@ GolWindow::GolWindow()
     vbox->addWidget(clearBtn);
     vbox->addWidget(speedLabel);
     vbox->addWidget(speedSlider);
-    groupBox->setLayout(vbox);
+    controlsBox->setLayout(vbox);
+}
 
-    connect(startBtn, &QPushButton::clicked, board, &GolBoard::start);
-    connect(pauseBtn, &QPushButton::clicked, board, &GolBoard::pause);
-    connect(populateBtn, &QPushButton::clicked, board, &GolBoard::populate);
-    connect(clearBtn, &QPushButton::clicked, board, &GolBoard::clear);
-    connect(speedSlider, &QSlider::valueChanged, board, &GolBoard::setTimeoutTime);
-    connect(speedSlider, &QSlider::valueChanged, this, &GolWindow::changeSliderLabel);
-
-    QGroupBox *groupBox2 = new QGroupBox(tr("Preferences"));
-    QVBoxLayout *vbox2 = new QVBoxLayout;
+void GolWindow::createPrefsBox(QGroupBox *prefsBox) {
+    QVBoxLayout *vbox = new QVBoxLayout;
 
     /* TODO: connect gridSize */
-
     QLabel *gridSizeLabel = new QLabel(tr("Grid size"));
     QHBoxLayout *hbox = new QHBoxLayout;
     QLineEdit *xSizeEdit = new QLineEdit("100");
@@ -67,59 +108,33 @@ GolWindow::GolWindow()
     popRatioBox->setSuffix("%");
     QPushButton *setBtn = new QPushButton(tr("Set"));
 
-    vbox2->addWidget(gridSizeLabel);
-    vbox2->addLayout(hbox);
-    vbox2->addWidget(popRatioLabel);
-    vbox2->addWidget(popRatioBox);
-    vbox2->addWidget(setBtn);
-    groupBox2->setLayout(vbox2);
+    vbox->addWidget(gridSizeLabel);
+    vbox->addLayout(hbox);
+    vbox->addWidget(popRatioLabel);
+    vbox->addWidget(popRatioBox);
+    vbox->addWidget(setBtn);
+    prefsBox->setLayout(vbox);
+}
 
+void GolWindow::createStatsBox(QGroupBox *statsBox) {
+    QVBoxLayout *vbox = new QVBoxLayout;
+    iterationLabel = new QLabel(tr("Iterations: 0"));
+    aliveCellsLabel = new QLabel(tr("Alive cells: 0"));
+    vbox->addWidget(iterationLabel);
+    vbox->addWidget(aliveCellsLabel);
+    statsBox->setLayout(vbox);
+}
+void GolWindow::createSignals() {
+    connect(startBtn, &QPushButton::clicked, board, &GolBoard::start);
+    connect(pauseBtn, &QPushButton::clicked, board, &GolBoard::pause);
+    connect(populateBtn, &QPushButton::clicked, board, &GolBoard::populate);
+    connect(clearBtn, &QPushButton::clicked, board, &GolBoard::clear);
+    connect(speedSlider, &QSlider::valueChanged, board, &GolBoard::setTimeoutTime);
+    connect(speedSlider, &QSlider::valueChanged, this, &GolWindow::changeSliderLabel);
     /* new connect syntax doesn't work with overloaded methods, usign old syntax */
     /* connect(popRatioBox, &QSpinBox::valueChanged, board, &GolBoard::setPopRatio); */
     connect(popRatioBox, SIGNAL(valueChanged(int)), board, SLOT(setPopRatio(int)));
 
-
-    QGroupBox *groupBox3 = new QGroupBox(tr("Statistics"));
-    QVBoxLayout *vbox3 = new QVBoxLayout;
-    iterationLabel = new QLabel(tr("Iterations: 0"));
-    aliveCellsLabel = new QLabel(tr("Alive cells: 0"));
-    vbox3->addWidget(iterationLabel);
-    vbox3->addWidget(aliveCellsLabel);
-    groupBox3->setLayout(vbox3);
-
     connect(board, &GolBoard::changeLabel, this, &GolWindow::changeLabel);
     connect(board, &GolBoard::checkPauseBtn, this, &GolWindow::checkPauseBtn);
-
-    QVBoxLayout *vbox4 = new QVBoxLayout(sidebar);
-    vbox4->addWidget(groupBox, 0, Qt::AlignTop);
-    vbox4->addWidget(groupBox2, 0, Qt::AlignTop);
-    vbox4->addWidget(groupBox3, 0, Qt::AlignTop);
-    vbox4->insertStretch(-1, 0);
-
-
-    QHBoxLayout *layout = new QHBoxLayout;
-    sidebar->setFixedWidth(sidebar->minimumSizeHint().width());
-    layout->addWidget(sidebar);
-    layout->addWidget(board);
-    setLayout(layout);
-    setWindowTitle(tr("Conway\'s Game of Life"));
-}
-
-void GolWindow::changeSliderLabel(int value) {
-    speedLabel->setText(QString(tr("%1 iterations/sec").arg(value)));
-}
-
-void GolWindow::changeLabel(QString label, QString text) {
-    if (0 == QString::compare(label, "iterationLabel")) {
-        iterationLabel->setText(text);
-        return;
-    }
-    if (0 == QString::compare(label, "aliveCellsLabel")) {
-        aliveCellsLabel->setText(text);
-        return;
-    }
-}
-
-void GolWindow::checkPauseBtn() {
-    pauseBtn->setChecked(true);
 }

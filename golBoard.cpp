@@ -5,54 +5,18 @@
 
 GolBoard::GolBoard(QWidget *parent) : QFrame(parent)
 {
+    std::srand(time(0));
     setFrameStyle(QFrame::Panel);
     setMouseTracking(true);
     height = 200;
     width = 200;
     cellsize = 3;
-    resize(width*cellsize+2*frameWidth(), height*cellsize+2*frameWidth());
-    populate();
     isPaused = true;
     iteration = 0;
     timeoutTime = 25;
     popRatio = 0.4f;
-    std::srand(time(0));
-}
-
-QSize GolBoard::sizeHint() const
-{
-    return QSize(width*cellsize+2*frameWidth(), height*cellsize+2*frameWidth());
-}
-
-QSize GolBoard::minimumSizeHint() const
-{
-    return QSize(width+2*frameWidth(), height+2*frameWidth());
-}
-
-void GolBoard::start() {
-    if (isPaused) {
-        isPaused = false;
-    }
-    timer.start(timeoutTime, this);
-}
-
-void GolBoard::pause() {
-    if (isPaused) {
-        iterate();
-        update();
-        return;
-    }
-    isPaused = true;
-    timer.stop();
-    update();
-}
-
-void GolBoard::populate() {
-    grid.clear();
-    for (int i=0; i<width*height; i++) {
-        grid << (rand() < popRatio * ((double)RAND_MAX + 1.0));
-    }
-    update();
+    resize(width*cellsize+2*frameWidth(), height*cellsize+2*frameWidth());
+    populate();
 }
 
 void GolBoard::clear() {
@@ -68,15 +32,67 @@ void GolBoard::clear() {
     update();
 }
 
-void GolBoard::paintEvent(QPaintEvent *event) {
-    QFrame::paintEvent(event);
-    QPainter painter(this);
-    for (int i=0; i < height; i++) {
-        for (int j=0; j < width; j++) {
-            if (grid[i*width + j]) {
-                drawCell(painter, i, j);
-            }
+void GolBoard::drawCell(QPainter &painter, int x, int y) {
+    QColor color = Qt::black;
+    painter.fillRect(x*cellsize+1, y*cellsize+1, cellsize, cellsize, color);
+}
+
+void GolBoard::iterate() {
+    int aliveCells = 0;
+    tmp_grid.clear();
+    for (int i=0; i<width*height; i++) {
+        tmp_grid << 0;
+    }
+    for (int n=0; n<grid.size(); n++) {
+        int ncount = neighbor_count(n);
+
+        if ((0 < grid.at(n)) && (2 == ncount || 3 == ncount)) {
+            /* Any live cell with two or three live neighbours
+             * lives on */
+            tmp_grid[n] = 1;
+            aliveCells++;
         }
+        else if ((0 == grid.at(n)) && (3 == ncount)) {
+            /* Any dead cell with exactly three live neighbours becomes
+             * alive */
+            tmp_grid[n] = 1;
+            aliveCells++;
+        }
+    }
+    grid = tmp_grid;
+
+    iteration++;
+    emit changeLabel("iterationLabel", QString("Iteration: %1").arg(iteration));
+    emit changeLabel("aliveCellsLabel", QString("Alive cells: %1").arg(aliveCells));
+}
+
+QSize GolBoard::minimumSizeHint() const
+{
+    return QSize(width+2*frameWidth(), height+2*frameWidth());
+}
+
+void GolBoard::mouseMoveEvent(QMouseEvent *event){
+    int x = (event->x()-frameWidth())/cellsize;
+    int y = (event->y()-frameWidth())/cellsize;
+    QToolTip::showText(event->globalPos(), QString(tr("(%1,%2)").arg(x).arg(y)));
+}
+
+void GolBoard::mousePressEvent(QMouseEvent *event) {
+    if (event->buttons() & Qt::LeftButton) {
+        int x = (event->x()-frameWidth())/cellsize;
+        int y = (event->y()-frameWidth())/cellsize;
+        int idx = (x*width + y);
+
+        if (idx < 0 || idx >= width*height)
+            return;
+
+        if (grid[idx]) {
+            grid[idx] = 0;
+        }
+        else {
+            grid[idx] = 1;
+        }
+        update();
     }
 }
 
@@ -120,38 +136,68 @@ int GolBoard::neighbor_count(int n) {
     return ncount;
 }
 
-void GolBoard::iterate() {
-    int aliveCells = 0;
-    tmp_grid.clear();
-    for (int i=0; i<width*height; i++) {
-        tmp_grid << 0;
-    }
-    for (int n=0; n<grid.size(); n++) { 
-        int ncount = neighbor_count(n);
-
-        if ((0 < grid.at(n)) && (2 == ncount || 3 == ncount)) {
-            /* Any live cell with two or three live neighbours
-             * lives on */
-            tmp_grid[n] = 1;
-            aliveCells++;
-        }
-        else if ((0 == grid.at(n)) && (3 == ncount)) {
-            /* Any dead cell with exactly three live neighbours becomes
-             * alive */
-            tmp_grid[n] = 1;
-            aliveCells++;
+void GolBoard::paintEvent(QPaintEvent *event) {
+    QFrame::paintEvent(event);
+    QPainter painter(this);
+    for (int i=0; i < height; i++) {
+        for (int j=0; j < width; j++) {
+            if (grid[i*width + j]) {
+                drawCell(painter, i, j);
+            }
         }
     }
-    grid = tmp_grid;
-
-    iteration++;
-    emit changeLabel("iterationLabel", QString("Iteration: %1").arg(iteration));
-    emit changeLabel("aliveCellsLabel", QString("Alive cells: %1").arg(aliveCells));
 }
 
-void GolBoard::drawCell(QPainter &painter, int x, int y) {
-    QColor color = Qt::black;
-    painter.fillRect(x*cellsize+1, y*cellsize+1, cellsize, cellsize, color);
+void GolBoard::pause() {
+    if (isPaused) {
+        iterate();
+        update();
+        return;
+    }
+    isPaused = true;
+    timer.stop();
+    update();
+}
+
+void GolBoard::populate() {
+    grid.clear();
+    for (int i=0; i<width*height; i++) {
+        grid << (rand() < popRatio * ((double)RAND_MAX + 1.0));
+    }
+    update();
+}
+
+void GolBoard::resizeEvent(QResizeEvent *event) {
+    QSize s = event->size();
+    int t = std::min(s.width(), s.height());
+    cellsize = t/width;
+    resize(width*cellsize+2*frameWidth(), height*cellsize+2*frameWidth());
+    update();
+}
+
+void GolBoard::setBoardSize(int w, int h) {
+    width = w;
+    height = h;
+}
+
+void GolBoard::setPopRatio(int p) {
+    popRatio = p / 100.0f;
+}
+
+void GolBoard::setTimeoutTime(int timeout) {
+    timeoutTime = 1000/timeout;
+}
+
+QSize GolBoard::sizeHint() const
+{
+    return QSize(width*cellsize+2*frameWidth(), height*cellsize+2*frameWidth());
+}
+
+void GolBoard::start() {
+    if (isPaused) {
+        isPaused = false;
+    }
+    timer.start(timeoutTime, this);
 }
 
 void GolBoard::timerEvent(QTimerEvent *event) {
@@ -164,54 +210,8 @@ void GolBoard::timerEvent(QTimerEvent *event) {
     }
 }
 
-void GolBoard::resizeEvent(QResizeEvent *event) {
-    QSize s = event->size();
-    int t = std::min(s.width(), s.height());
-    cellsize = t/width;
-    resize(width*cellsize+2*frameWidth(), height*cellsize+2*frameWidth());
-    update();
-}
-
-void GolBoard::mousePressEvent(QMouseEvent *event) {
-    if (event->buttons() & Qt::LeftButton) {
-        int x = (event->x()-frameWidth())/cellsize;
-        int y = (event->y()-frameWidth())/cellsize;
-        int idx = (x*width + y);
-
-        if (idx < 0 || idx >= width*height)
-            return;
-
-        if (grid[idx]) {
-            grid[idx] = 0;
-        }
-        else {
-            grid[idx] = 1;
-        }
-        update();
-    }
-}
-
-void GolBoard::mouseMoveEvent(QMouseEvent *event){
-    int x = (event->x()-frameWidth())/cellsize;
-    int y = (event->y()-frameWidth())/cellsize;
-    QToolTip::showText(event->globalPos(), QString(tr("(%1,%2)").arg(x).arg(y)));
-}
-
 void GolBoard::wheelEvent(QWheelEvent *event) {
     int tmp_cellsize = cellsize + (event->angleDelta()/120).y();
     cellsize = std::min(size().width()/width, std::max(1, tmp_cellsize));
     update();
-}
-
-void GolBoard::setTimeoutTime(int timeout) {
-    timeoutTime = 1000/timeout;
-}
-
-void GolBoard::setPopRatio(int p) {
-    popRatio = p / 100.0f;
-}
-
-void GolBoard::setBoardSize(int w, int h) {
-    width = w;
-    height = h;
 }

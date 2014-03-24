@@ -4,13 +4,14 @@
 #include <QFrame>
 #include <QWidget>
 
-class QPushButton;
-class QSpinBox;
 class GolBoard;
-class QSlider;
-class QString;
+class QGroupBox;
 class QLabel;
+class QPushButton;
 class QScreen;
+class QSlider;
+class QSpinBox;
+class QString;
 
 class GolWindow : public QWidget
 {
@@ -25,16 +26,20 @@ public slots:
     void checkPauseBtn();
 
 private:
-    GolBoard *board;
-    QPushButton *startBtn;
-    QPushButton *pauseBtn;
-    QPushButton *clearBtn;
-    QPushButton *populateBtn;
-    QSpinBox *popRatioBox;
-    QSlider *speedSlider;
-    QLabel *iterationLabel;
     QLabel *aliveCellsLabel;
+    GolBoard *board;
+    QPushButton *clearBtn;
+    QLabel *iterationLabel;
+    QPushButton *pauseBtn;
+    QSpinBox *popRatioBox;
+    QPushButton *populateBtn;
     QLabel *speedLabel;
+    QSlider *speedSlider;
+    QPushButton *startBtn;
+    void createControlsBox(QGroupBox*);
+    void createPrefsBox(QGroupBox*);
+    void createStatsBox(QGroupBox*);
+    void createSignals();
 };
 
 #endif
