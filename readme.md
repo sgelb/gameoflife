@@ -17,15 +17,12 @@ Simple implementation of Conways's »Game of Life«, written in C++ and using QT
 - adjustable speed of iterations
 - statistics (number of iterations and cells alive)
 - create patterns by drawing on board
-- basic zooming of board
 
 #### Todo
 
-- zoom doesn't work in fullscreen mode
+- better zoom
+- sane resizing
 - custom board size
-- resizable window/board frame
 - toggle wrap
-- refactor game logic
-- save history to forward/backward a few iterations
-- prefab patterns
+- prefabricated patterns
 - save/load boards

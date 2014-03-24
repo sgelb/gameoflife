@@ -1,6 +1,5 @@
 #include <QtWidgets>
 
-#include <iostream>
 #include "golWindow.h"
 #include "golBoard.h"
 
@@ -90,15 +89,15 @@ void GolWindow::createPrefsBox(QGroupBox *prefsBox) {
     QVBoxLayout *vbox = new QVBoxLayout;
 
     /* TODO: connect gridSize */
-    QLabel *gridSizeLabel = new QLabel(tr("Grid size"));
-    QHBoxLayout *hbox = new QHBoxLayout;
-    QLineEdit *xSizeEdit = new QLineEdit("100");
-    xSizeEdit->setMaxLength(3);
-    QLineEdit *ySizeEdit = new QLineEdit("100");
-    ySizeEdit->setMaxLength(3);
-    hbox->addWidget(xSizeEdit);
-    hbox->addWidget(new QLabel(tr("x")));
-    hbox->addWidget(ySizeEdit);
+    /* QLabel *gridSizeLabel = new QLabel(tr("Grid size")); */
+    /* QHBoxLayout *hbox = new QHBoxLayout; */
+    /* QLineEdit *xSizeEdit = new QLineEdit("100"); */
+    /* xSizeEdit->setMaxLength(3); */
+    /* QLineEdit *ySizeEdit = new QLineEdit("100"); */
+    /* ySizeEdit->setMaxLength(3); */
+    /* hbox->addWidget(xSizeEdit); */
+    /* hbox->addWidget(new QLabel(tr("x"))); */
+    /* hbox->addWidget(ySizeEdit); */
 
     QLabel *popRatioLabel = new QLabel(tr("Initial ratio of alive cells"));
     popRatioBox = new QSpinBox;
@@ -106,13 +105,13 @@ void GolWindow::createPrefsBox(QGroupBox *prefsBox) {
     popRatioBox->setSingleStep(1);
     popRatioBox->setValue(30);
     popRatioBox->setSuffix("%");
-    QPushButton *setBtn = new QPushButton(tr("Set"));
+    /* QPushButton *setBtn = new QPushButton(tr("Set")); */
 
-    vbox->addWidget(gridSizeLabel);
-    vbox->addLayout(hbox);
+    /* vbox->addWidget(gridSizeLabel); */
+    /* vbox->addLayout(hbox); */
     vbox->addWidget(popRatioLabel);
     vbox->addWidget(popRatioBox);
-    vbox->addWidget(setBtn);
+    /* vbox->addWidget(setBtn); */
     prefsBox->setLayout(vbox);
 }
 
@@ -128,11 +127,10 @@ void GolWindow::createSignals() {
     connect(startBtn, &QPushButton::clicked, board, &GolBoard::start);
     connect(pauseBtn, &QPushButton::clicked, board, &GolBoard::pause);
     connect(populateBtn, &QPushButton::clicked, board, &GolBoard::populate);
-    connect(clearBtn, &QPushButton::clicked, board, &GolBoard::clear);
+    connect(clearBtn, &QPushButton::clicked, board, &GolBoard::reset);
     connect(speedSlider, &QSlider::valueChanged, board, &GolBoard::setTimeoutTime);
     connect(speedSlider, &QSlider::valueChanged, this, &GolWindow::changeSliderLabel);
-    /* new connect syntax doesn't work with overloaded methods, usign old syntax */
-    /* connect(popRatioBox, &QSpinBox::valueChanged, board, &GolBoard::setPopRatio); */
+    /* new connect syntax doesn't work with overloaded methods, using old syntax */
     connect(popRatioBox, SIGNAL(valueChanged(int)), board, SLOT(setPopRatio(int)));
 
     connect(board, &GolBoard::changeLabel, this, &GolWindow::changeLabel);

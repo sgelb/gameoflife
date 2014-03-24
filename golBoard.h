@@ -18,16 +18,16 @@ class GolBoard : public QFrame
         QSize sizeHint() const;
 
     public slots:
-        void clear();
         void pause();
         void populate();
+        void reset();
         void setBoardSize(int w, int h);
         void setPopRatio(int ratio);
         void setTimeoutTime(int timeout);
         void start();
 
     signals:
-        void changeLabel(QString label, QString text);
+        void changeLabel(QString, QString);
         void checkPauseBtn();
 
     protected:
@@ -39,21 +39,20 @@ class GolBoard : public QFrame
         void wheelEvent(QWheelEvent *event);
 
     private:
-        void drawCell(QPainter &painter, int x, int y);
-        void iterate();
-        int neighbor_count(int);
-
+        int boardHeight;
+        int boardWidth;
         int cellsize;
+        void drawCell(QPainter &painter, int x, int y);
         QList<int> grid;
-        int height;
         bool isPaused;
+        void iterate();
         int iteration;
         QString iterationText;
+        int neighbor_count(int);
         double popRatio;
         int timeoutTime;
         QBasicTimer timer;
         QList<int> tmp_grid;
-        int width;
 };
 
 #endif
