@@ -32,11 +32,10 @@ GolWindow::GolWindow()
 
     /* put everything together */
     QHBoxLayout *layout = new QHBoxLayout;
-    sidebar->setFixedWidth(sidebar->minimumSizeHint().width());
-    layout->addWidget(sidebar);
-    layout->addWidget(board);
-    setLayout(layout);
+    layout->addWidget(sidebar, 0, Qt::AlignLeft|Qt::AlignTop);
+    layout->addWidget(board, 1, Qt::AlignLeft|Qt::AlignTop);
     setWindowTitle(tr("Conway\'s Game of Life"));
+    setLayout(layout);
 }
 
 void GolWindow::changeLabel(QString label, QString text) {
