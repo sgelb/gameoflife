@@ -11,9 +11,6 @@ class GolBoard : public QFrame
     Q_OBJECT
 
     public:
-        bool hasHeightForWidth() const { return true; }
-        int heightForWidth( int w ) const { return w; }
-        QSize minimumSizeHint() const;
         GolBoard(QWidget *parent = 0);
         QSize sizeHint() const;
 
@@ -29,12 +26,12 @@ class GolBoard : public QFrame
     signals:
         void changeLabel(QString, QString);
         void checkPauseBtn();
+        void setMinSizeScrollArea();
 
     protected:
         void mouseMoveEvent(QMouseEvent *event);
         void mousePressEvent(QMouseEvent *event);
         void paintEvent(QPaintEvent *event);
-        void resizeEvent(QResizeEvent * event);
         void timerEvent(QTimerEvent *event);
         void wheelEvent(QWheelEvent *event);
 

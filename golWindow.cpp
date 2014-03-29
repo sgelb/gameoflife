@@ -1,4 +1,5 @@
 #include <QtWidgets>
+#include <iostream>
 
 #include "golWindow.h"
 #include "golBoard.h"
@@ -6,7 +7,11 @@
 GolWindow::GolWindow()
 {
     board = new GolBoard;
-    QWidget *sidebar = new QWidget;
+    sidebar = new QWidget;
+    scrollArea = new QScrollArea;
+    scrollArea->setWidget(board);
+    scrollArea->setWidgetResizable(false);
+    setMinSizeScrollArea();
 
     /* Controls */
     QGroupBox *controlsBox = new QGroupBox("Controls");
@@ -33,7 +38,7 @@ GolWindow::GolWindow()
     /* put everything together */
     QHBoxLayout *layout = new QHBoxLayout;
     layout->addWidget(sidebar, 0, Qt::AlignLeft|Qt::AlignTop);
-    layout->addWidget(board, 1, Qt::AlignLeft|Qt::AlignTop);
+    layout->addWidget(scrollArea);
     setWindowTitle(tr("Conway\'s Game of Life"));
     setLayout(layout);
 }
@@ -134,4 +139,15 @@ void GolWindow::createSignals() {
 
     connect(board, &GolBoard::changeLabel, this, &GolWindow::changeLabel);
     connect(board, &GolBoard::checkPauseBtn, this, &GolWindow::checkPauseBtn);
+    connect(board, &GolBoard::setMinSizeScrollArea, this, &GolWindow::setMinSizeScrollArea);
+}
+
+void GolWindow::setMinSizeScrollArea() {
+    QWidget *vp = scrollArea->viewport();
+    int boardTotalWidth = board->width()+board->frameWidth()*2;
+    int boardTotalHeight= board->height()+board->frameWidth()*2;
+
+    if (vp->width() > boardTotalWidth || vp->height() > boardTotalHeight) {
+        scrollArea->setMinimumSize(boardTotalWidth, boardTotalHeight);
+    }
 }

@@ -9,6 +9,7 @@ class QGroupBox;
 class QLabel;
 class QPushButton;
 class QScreen;
+class QScrollArea;
 class QSlider;
 class QSpinBox;
 class QString;
@@ -24,22 +25,25 @@ public slots:
     void changeLabel(QString, QString);
     void changeSliderLabel(int);
     void checkPauseBtn();
+    void setMinSizeScrollArea();
 
 private:
-    QLabel *aliveCellsLabel;
     GolBoard *board;
-    QPushButton *clearBtn;
+    QLabel *aliveCellsLabel;
     QLabel *iterationLabel;
-    QPushButton *pauseBtn;
-    QSpinBox *popRatioBox;
-    QPushButton *populateBtn;
     QLabel *speedLabel;
-    QSlider *speedSlider;
+    QPushButton *clearBtn;
+    QPushButton *pauseBtn;
+    QPushButton *populateBtn;
     QPushButton *startBtn;
+    QScrollArea *scrollArea;
+    QSlider *speedSlider;
+    QSpinBox *popRatioBox;
+    QWidget *sidebar;
     void createControlsBox(QGroupBox*);
     void createPrefsBox(QGroupBox*);
-    void createStatsBox(QGroupBox*);
     void createSignals();
+    void createStatsBox(QGroupBox*);
 };
 
 #endif

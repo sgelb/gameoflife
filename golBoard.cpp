@@ -3,13 +3,12 @@
 
 #include "golBoard.h"
 
-GolBoard::GolBoard(QWidget *parent) : QFrame(parent)
-{
+GolBoard::GolBoard(QWidget *parent) : QFrame(parent) {
     std::srand(time(0));
     setFrameStyle(QFrame::Panel);
     setMouseTracking(true);
-    boardHeight = 250;
-    boardWidth = 250;
+    boardHeight = 200;
+    boardWidth = 200;
     cellsize = 3;
     isPaused = true;
     iteration = 0;
@@ -52,12 +51,7 @@ void GolBoard::iterate() {
     emit changeLabel("aliveCellsLabel", QString(tr("Alive cells: %1").arg(aliveCells)));
 }
 
-QSize GolBoard::minimumSizeHint() const
-{
-    return QSize(boardWidth+2*frameWidth(), boardHeight+2*frameWidth());
-}
-
-void GolBoard::mouseMoveEvent(QMouseEvent *event){
+void GolBoard::mouseMoveEvent(QMouseEvent *event) {
     int x = (event->x()-frameWidth())/cellsize;
     int y = (event->y()-frameWidth())/cellsize;
     QToolTip::showText(event->globalPos(), QString(tr("(%1,%2)").arg(x).arg(y)));
@@ -169,14 +163,6 @@ void GolBoard::reset() {
     update();
 }
 
-void GolBoard::resizeEvent(QResizeEvent *event) {
-    QSize s = event->size();
-    int t = std::min(s.width(), s.height());
-    cellsize = t/boardWidth;
-    resize(boardWidth*cellsize+2*frameWidth(), boardHeight*cellsize+2*frameWidth());
-    update();
-}
-
 void GolBoard::setBoardSize(int w, int h) {
     boardWidth = w;
     boardHeight = h;
@@ -190,8 +176,7 @@ void GolBoard::setTimeoutTime(int timeout) {
     timeoutTime = 1000/timeout;
 }
 
-QSize GolBoard::sizeHint() const
-{
+QSize GolBoard::sizeHint() const {
     return QSize(boardWidth*cellsize+2*frameWidth(), boardHeight*cellsize+2*frameWidth());
 }
 
@@ -214,8 +199,9 @@ void GolBoard::timerEvent(QTimerEvent *event) {
 
 void GolBoard::wheelEvent(QWheelEvent *event) {
     int tmp_cellsize = cellsize + (event->angleDelta()/120).y();
-    /* cellsize = std::min(size().width()/boardWidth, std::max(1, tmp_cellsize)); */
     cellsize = std::max(1, tmp_cellsize);
     resize(boardWidth*cellsize+2*frameWidth(), boardHeight*cellsize+2*frameWidth());
     update();
+    if (event->angleDelta().y() < 0)
+        emit setMinSizeScrollArea();
 }
