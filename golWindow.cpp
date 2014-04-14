@@ -1,11 +1,9 @@
 #include <QtWidgets>
-#include <iostream>
 
-#include "golWindow.h"
-#include "golBoard.h"
+#include "./golWindow.h"
+#include "./golBoard.h"
 
-GolWindow::GolWindow()
-{
+GolWindow::GolWindow() {
     board = new GolBoard;
     sidebar = new QWidget;
     scrollArea = new QScrollArea;
@@ -134,12 +132,33 @@ void GolWindow::createSignals() {
     connect(clearBtn, &QPushButton::clicked, board, &GolBoard::reset);
     connect(speedSlider, &QSlider::valueChanged, board, &GolBoard::setTimeoutTime);
     connect(speedSlider, &QSlider::valueChanged, this, &GolWindow::changeSliderLabel);
-    /* new connect syntax doesn't work with overloaded methods, using old syntax */
+    /* new connect syntax doesn't work with overloaded methods, using old one*/
     connect(popRatioBox, SIGNAL(valueChanged(int)), board, SLOT(setPopRatio(int)));
 
     connect(board, &GolBoard::changeLabel, this, &GolWindow::changeLabel);
     connect(board, &GolBoard::checkPauseBtn, this, &GolWindow::checkPauseBtn);
     connect(board, &GolBoard::setMinSizeScrollArea, this, &GolWindow::setMinSizeScrollArea);
+    connect(board, &GolBoard::justifyBoardZoom, this, &GolWindow::justifyBoardZoom);
+}
+
+void GolWindow::justifyBoardZoom(int x, int y, int cellsize) {
+    /* scrollArea->verticalScrollBar()->setSingleStep(cellsize); */
+    /* scrollArea->horizontalScrollBar()->setSingleStep(cellsize); */
+    QWidget *vp = scrollArea->viewport();
+    fprintf(stderr, "board x\t%d\n", y);
+    fprintf(stderr, "board width\t%d\n", x);
+    fprintf(stderr, "view pane width\t%d\n", vp->width());
+    fprintf(stderr, "----------------------\n");
+
+    int i = scrollArea->verticalScrollBar()->width();
+    /* int i = scrollArea->verticalScrollBar()->maximum()/2; */
+    scrollArea->verticalScrollBar()->setValue(x+i);
+
+    int j = scrollArea->horizontalScrollBar()->maximum()/2;
+    scrollArea->horizontalScrollBar()->setValue(y+i);
+
+
+    /* std::cout << scrollArea->verticalScrollBar()->maximum() << ":"; */
 }
 
 void GolWindow::setMinSizeScrollArea() {

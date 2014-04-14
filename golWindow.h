@@ -1,5 +1,5 @@
-#ifndef GOLWINDOW_H
-#define GOLWINDOW_H
+#ifndef GOLWINDOW_H_
+#define GOLWINDOW_H_
 
 #include <QFrame>
 #include <QWidget>
@@ -14,20 +14,20 @@ class QSlider;
 class QSpinBox;
 class QString;
 
-class GolWindow : public QWidget
-{
-    Q_OBJECT
+class GolWindow : public QWidget {
+  Q_OBJECT
 
-public:
+ public:
     GolWindow();
 
-public slots:
+ public slots:
     void changeLabel(QString, QString);
-    void changeSliderLabel(int);
+    void changeSliderLabel(int value);
     void checkPauseBtn();
+    void justifyBoardZoom(int x, int y, int cellsize);
     void setMinSizeScrollArea();
 
-private:
+ private:
     GolBoard *board;
     QLabel *aliveCellsLabel;
     QLabel *iterationLabel;
@@ -40,10 +40,10 @@ private:
     QSlider *speedSlider;
     QSpinBox *popRatioBox;
     QWidget *sidebar;
-    void createControlsBox(QGroupBox*);
-    void createPrefsBox(QGroupBox*);
+    void createControlsBox(QGroupBox* box);
+    void createPrefsBox(QGroupBox* box);
     void createSignals();
-    void createStatsBox(QGroupBox*);
+    void createStatsBox(QGroupBox* box);
 };
 
-#endif
+#endif  // GOLWINDOW_H_
