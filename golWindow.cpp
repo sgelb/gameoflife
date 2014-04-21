@@ -141,24 +141,11 @@ void GolWindow::createSignals() {
     connect(board, &GolBoard::justifyBoardZoom, this, &GolWindow::justifyBoardZoom);
 }
 
-void GolWindow::justifyBoardZoom(int x, int y, int cellsize) {
-    /* scrollArea->verticalScrollBar()->setSingleStep(cellsize); */
-    /* scrollArea->horizontalScrollBar()->setSingleStep(cellsize); */
-    QWidget *vp = scrollArea->viewport();
-    fprintf(stderr, "board x\t%d\n", y);
-    fprintf(stderr, "board width\t%d\n", x);
-    fprintf(stderr, "view pane width\t%d\n", vp->width());
-    fprintf(stderr, "----------------------\n");
-
-    int i = scrollArea->verticalScrollBar()->width();
-    /* int i = scrollArea->verticalScrollBar()->maximum()/2; */
-    scrollArea->verticalScrollBar()->setValue(x+i);
-
-    int j = scrollArea->horizontalScrollBar()->maximum()/2;
-    scrollArea->horizontalScrollBar()->setValue(y+i);
-
-
-    /* std::cout << scrollArea->verticalScrollBar()->maximum() << ":"; */
+void GolWindow::justifyBoardZoom(int x, int y) {
+    int offset_x = scrollArea->horizontalScrollBar()->value();
+    int offset_y = scrollArea->verticalScrollBar()->value();
+    scrollArea->horizontalScrollBar()->setValue(x+offset_x);
+    scrollArea->verticalScrollBar()->setValue(y+offset_y);
 }
 
 void GolWindow::setMinSizeScrollArea() {

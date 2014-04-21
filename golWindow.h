@@ -24,7 +24,7 @@ class GolWindow : public QWidget {
     void changeLabel(QString, QString);
     void changeSliderLabel(int value);
     void checkPauseBtn();
-    void justifyBoardZoom(int x, int y, int cellsize);
+    void justifyBoardZoom(int x, int y);
     void setMinSizeScrollArea();
 
  private:

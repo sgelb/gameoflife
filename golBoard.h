@@ -25,7 +25,7 @@ class GolBoard : public QFrame {
  signals:
     void changeLabel(QString, QString);
     void checkPauseBtn();
-    void justifyBoardZoom(int x, int y, int cellsize);
+    void justifyBoardZoom(int x, int y);
     void setMinSizeScrollArea();
 
  protected:

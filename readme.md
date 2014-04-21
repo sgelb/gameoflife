@@ -22,10 +22,7 @@ Simple implementation of Conways's »Game of Life«, written in C++ and using QT
 
 #### Todo
 
-- mouse wheel zooming on pointer
 - zoom buttons: 100%, +, -
-- move zoomed board
-- sane resizing
 - custom board size
 - toggle wrap
 - prefabricated patterns

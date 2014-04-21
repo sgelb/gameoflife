@@ -1,4 +1,5 @@
 #include <QtWidgets>
+#include <algorithm>
 
 #include "./golBoard.h"
 
@@ -6,9 +7,9 @@ GolBoard::GolBoard(QWidget *parent) : QFrame(parent) {
     std::srand(time(0));
     setFrameStyle(QFrame::Panel);
     setMouseTracking(true);
-    boardHeight = 160;
-    boardWidth = 160;
-    cellsize = 3;
+    boardHeight = 100;
+    boardWidth = 100;
+    cellsize = 4;
     isPaused = true;
     iteration = 0;
     timeoutTime = 25;
@@ -195,21 +196,22 @@ void GolBoard::timerEvent(QTimerEvent *event) {
 }
 
 void GolBoard::wheelEvent(QWheelEvent *event) {
-    int old_cellsize = cellsize;
+    int old_width = width();
+    int old_height = height();
     int tmp_cellsize = cellsize + (event->angleDelta()/120).y();
-    cellsize = std::max(1, tmp_cellsize);
-    resize(boardWidth*cellsize+2*frameWidth(),
-           boardHeight*cellsize+2*frameWidth());
+
     if (event->angleDelta().y() < 0) {
         emit setMinSizeScrollArea();
     }
-    /* FIXME */
-    /* int xpos = ((event->x()-frameWidth())/old_cellsize)*cellsize; */
-    /* int ypos = ((event->y()-frameWidth())/old_cellsize)*cellsize; */
-    fprintf(stderr, "X: %d\n", event->x());
-    /* std::cout << "X: " << event->x() << std::endl; */
-    /* emit justifyBoardZoom(xpos, ypos, cellsize); */
 
-    emit justifyBoardZoom(width(), event->x()-frameWidth(), cellsize);
+    cellsize = std::max(1, tmp_cellsize);
+    resize(boardWidth*cellsize+2*frameWidth(),
+           boardHeight*cellsize+2*frameWidth());
+
+    /* calculate new x- and y-position. substraction of old scrollbar value */
+    /* is done in justifyBoardZoom() */
+    int new_x = (width()*event->x()-old_width*event->x())/old_width;
+    int new_y = (height()*event->y()-old_height*event->y())/old_height;
+    emit justifyBoardZoom(new_x, new_y);
     update();
 }
