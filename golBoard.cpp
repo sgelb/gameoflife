@@ -1,16 +1,15 @@
 #include <QtWidgets>
-#include <iostream>
+#include <algorithm>
 
-#include "golBoard.h"
+#include "./golBoard.h"
 
-GolBoard::GolBoard(QWidget *parent) : QFrame(parent)
-{
+GolBoard::GolBoard(QWidget *parent) : QFrame(parent) {
     std::srand(time(0));
     setFrameStyle(QFrame::Panel);
     setMouseTracking(true);
-    boardHeight = 250;
-    boardWidth = 250;
-    cellsize = 3;
+    boardHeight = 100;
+    boardWidth = 100;
+    cellsize = 4;
     isPaused = true;
     iteration = 0;
     timeoutTime = 25;
@@ -26,10 +25,10 @@ void GolBoard::drawCell(QPainter &painter, int x, int y) {
 void GolBoard::iterate() {
     int aliveCells = 0;
     tmp_grid.clear();
-    for (int i=0; i<boardWidth*boardHeight; i++) {
+    for (int i = 0; i < boardWidth*boardHeight; i++) {
         tmp_grid << 0;
     }
-    for (int n=0; n<boardWidth*boardHeight; n++) {
+    for (int n = 0; n < boardWidth*boardHeight; n++) {
         int ncount = neighbor_count(n);
 
         if ((0 < grid.at(n)) && (2 == ncount || 3 == ncount)) {
@@ -37,30 +36,24 @@ void GolBoard::iterate() {
              * lives on */
             tmp_grid[n] = 1;
             aliveCells++;
-        }
-        else if ((0 == grid.at(n)) && (3 == ncount)) {
-            /* Any dead cell with exactly three live neighbours becomes
-             * alive */
-            tmp_grid[n] = 1;
-            aliveCells++;
+        } else if ((0 == grid.at(n)) && (3 == ncount)) {
+          /* Any dead cell with exactly three live neighbours becomes
+           * alive */
+          tmp_grid[n] = 1;
+          aliveCells++;
         }
     }
     grid = tmp_grid;
 
     iteration++;
-    emit changeLabel("iterationLabel", QString(tr("Iterations: %1").arg(iteration)));
-    emit changeLabel("aliveCellsLabel", QString(tr("Alive cells: %1").arg(aliveCells)));
+    emit changeLabel("iterationLabel", tr("Iterations: %1").arg(iteration));
+    emit changeLabel("aliveCellsLabel", tr("Alive cells: %1").arg(aliveCells));
 }
 
-QSize GolBoard::minimumSizeHint() const
-{
-    return QSize(boardWidth+2*frameWidth(), boardHeight+2*frameWidth());
-}
-
-void GolBoard::mouseMoveEvent(QMouseEvent *event){
+void GolBoard::mouseMoveEvent(QMouseEvent *event) {
     int x = (event->x()-frameWidth())/cellsize;
     int y = (event->y()-frameWidth())/cellsize;
-    QToolTip::showText(event->globalPos(), QString(tr("(%1,%2)").arg(x).arg(y)));
+    QToolTip::showText(event->globalPos(), tr("(%1,%2)").arg(x).arg(y));
 }
 
 void GolBoard::mousePressEvent(QMouseEvent *event) {
@@ -74,16 +67,14 @@ void GolBoard::mousePressEvent(QMouseEvent *event) {
 
         if (grid[idx]) {
             grid[idx] = 0;
-        }
-        else {
-            grid[idx] = 1;
+        } else {
+          grid[idx] = 1;
         }
         update();
     }
 }
 
 int GolBoard::neighbor_count(int n) {
-
     /* | n-w-1 | n-w | n-w+1 | */
     /* | n-1   | n   | n+1   | */
     /* | n+w-1 | n+w | n+w+1 | */
@@ -125,8 +116,8 @@ int GolBoard::neighbor_count(int n) {
 void GolBoard::paintEvent(QPaintEvent *event) {
     QFrame::paintEvent(event);
     QPainter painter(this);
-    for (int y=0; y < boardHeight; y++) {
-        for (int x=0; x < boardWidth; x++) {
+    for (int y = 0; y < boardHeight; y++) {
+        for (int x = 0; x < boardWidth; x++) {
             if (grid[y*boardWidth + x]) {
                 drawCell(painter, x, y);
             }
@@ -148,32 +139,24 @@ void GolBoard::pause() {
 void GolBoard::populate() {
     grid.clear();
     int aliveCells = 0;
-    for (int i=0; i<boardWidth*boardHeight; i++) {
-        grid << (rand() < popRatio * ((double)RAND_MAX + 1.0));
+    for (int i = 0; i < boardWidth*boardHeight; i++) {
+        grid << (rand() < popRatio * static_cast<double>(RAND_MAX + 1.0));
         if (grid[i] > 0) aliveCells++;
     }
-    emit changeLabel("aliveCellsLabel", QString(tr("Alive cells: %1").arg(aliveCells)));
+    emit changeLabel("aliveCellsLabel", tr("Alive cells: %1").arg(aliveCells));
     update();
 }
 
 void GolBoard::reset() {
     grid.clear();
-    for (int i=0; i<boardWidth*boardHeight; i++) {
+    for (int i = 0; i < boardWidth*boardHeight; i++) {
         grid << 0;
     }
     isPaused = true;
     timer.stop();
     iteration = 0;
-    emit changeLabel("iterationLabel", QString(tr("Iterations: %1").arg(iteration)));
+    emit changeLabel("iterationLabel", tr("Iterations: %1").arg(iteration));
     emit checkPauseBtn();
-    update();
-}
-
-void GolBoard::resizeEvent(QResizeEvent *event) {
-    QSize s = event->size();
-    int t = std::min(s.width(), s.height());
-    cellsize = t/boardWidth;
-    resize(boardWidth*cellsize+2*frameWidth(), boardHeight*cellsize+2*frameWidth());
     update();
 }
 
@@ -182,17 +165,17 @@ void GolBoard::setBoardSize(int w, int h) {
     boardHeight = h;
 }
 
-void GolBoard::setPopRatio(int p) {
-    popRatio = p / 100.0f;
+void GolBoard::setPopRatio(int value) {
+    popRatio = value / 100.0f;
 }
 
 void GolBoard::setTimeoutTime(int timeout) {
     timeoutTime = 1000/timeout;
 }
 
-QSize GolBoard::sizeHint() const
-{
-    return QSize(boardWidth*cellsize+2*frameWidth(), boardHeight*cellsize+2*frameWidth());
+QSize GolBoard::sizeHint() const {
+    return QSize(boardWidth*cellsize+2*frameWidth(),
+        boardHeight*cellsize+2*frameWidth());
 }
 
 void GolBoard::start() {
@@ -213,9 +196,22 @@ void GolBoard::timerEvent(QTimerEvent *event) {
 }
 
 void GolBoard::wheelEvent(QWheelEvent *event) {
+    int old_width = width();
+    int old_height = height();
     int tmp_cellsize = cellsize + (event->angleDelta()/120).y();
-    /* cellsize = std::min(size().width()/boardWidth, std::max(1, tmp_cellsize)); */
+
+    if (event->angleDelta().y() < 0) {
+        emit setMinSizeScrollArea();
+    }
+
     cellsize = std::max(1, tmp_cellsize);
-    resize(boardWidth*cellsize+2*frameWidth(), boardHeight*cellsize+2*frameWidth());
+    resize(boardWidth*cellsize+2*frameWidth(),
+           boardHeight*cellsize+2*frameWidth());
+
+    /* calculate new x- and y-position. substraction of old scrollbar value */
+    /* is done in justifyBoardZoom() */
+    int new_x = (width()*event->x()-old_width*event->x())/old_width;
+    int new_y = (height()*event->y()-old_height*event->y())/old_height;
+    emit justifyBoardZoom(new_x, new_y);
     update();
 }

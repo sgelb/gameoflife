@@ -1,12 +1,15 @@
 #include <QtWidgets>
 
-#include "golWindow.h"
-#include "golBoard.h"
+#include "./golWindow.h"
+#include "./golBoard.h"
 
-GolWindow::GolWindow()
-{
+GolWindow::GolWindow() {
     board = new GolBoard;
-    QWidget *sidebar = new QWidget;
+    sidebar = new QWidget;
+    scrollArea = new QScrollArea;
+    scrollArea->setWidget(board);
+    scrollArea->setWidgetResizable(false);
+    setMinSizeScrollArea();
 
     /* Controls */
     QGroupBox *controlsBox = new QGroupBox("Controls");
@@ -33,7 +36,7 @@ GolWindow::GolWindow()
     /* put everything together */
     QHBoxLayout *layout = new QHBoxLayout;
     layout->addWidget(sidebar, 0, Qt::AlignLeft|Qt::AlignTop);
-    layout->addWidget(board, 1, Qt::AlignLeft|Qt::AlignTop);
+    layout->addWidget(scrollArea);
     setWindowTitle(tr("Conway\'s Game of Life"));
     setLayout(layout);
 }
@@ -129,9 +132,28 @@ void GolWindow::createSignals() {
     connect(clearBtn, &QPushButton::clicked, board, &GolBoard::reset);
     connect(speedSlider, &QSlider::valueChanged, board, &GolBoard::setTimeoutTime);
     connect(speedSlider, &QSlider::valueChanged, this, &GolWindow::changeSliderLabel);
-    /* new connect syntax doesn't work with overloaded methods, using old syntax */
+    /* new connect syntax doesn't work with overloaded methods, using old one*/
     connect(popRatioBox, SIGNAL(valueChanged(int)), board, SLOT(setPopRatio(int)));
 
     connect(board, &GolBoard::changeLabel, this, &GolWindow::changeLabel);
     connect(board, &GolBoard::checkPauseBtn, this, &GolWindow::checkPauseBtn);
+    connect(board, &GolBoard::setMinSizeScrollArea, this, &GolWindow::setMinSizeScrollArea);
+    connect(board, &GolBoard::justifyBoardZoom, this, &GolWindow::justifyBoardZoom);
+}
+
+void GolWindow::justifyBoardZoom(int x, int y) {
+    int offset_x = scrollArea->horizontalScrollBar()->value();
+    int offset_y = scrollArea->verticalScrollBar()->value();
+    scrollArea->horizontalScrollBar()->setValue(x+offset_x);
+    scrollArea->verticalScrollBar()->setValue(y+offset_y);
+}
+
+void GolWindow::setMinSizeScrollArea() {
+    QWidget *vp = scrollArea->viewport();
+    int boardTotalWidth = board->width()+board->frameWidth()*2;
+    int boardTotalHeight= board->height()+board->frameWidth()*2;
+
+    if (vp->width() > boardTotalWidth || vp->height() > boardTotalHeight) {
+        scrollArea->setMinimumSize(boardTotalWidth, boardTotalHeight);
+    }
 }
