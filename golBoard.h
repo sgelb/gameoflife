@@ -44,6 +44,7 @@ class GolBoard : public QFrame {
     int boardHeight;
     int boardWidth;
     int cellsize;
+    int countAliveCells();
     void drawCell(QPainter &painter, int x, int y);
     QList<int> grid;
     bool isPaused;

@@ -5,6 +5,8 @@
 
 #include <QtWidgets>
 #include <algorithm>
+#include <numeric>
+#include <functional>
 
 #include "./golBoard.h"
 
@@ -22,13 +24,16 @@ GolBoard::GolBoard(QWidget *parent) : QFrame(parent) {
     populate();
 }
 
+int GolBoard::countAliveCells() {
+  return std::accumulate(grid.begin(), grid.end(), 0, std::plus<int>());
+}
+
 void GolBoard::drawCell(QPainter &painter, int x, int y) {
     QColor color = Qt::black;
     painter.fillRect(x*cellsize+1, y*cellsize+1, cellsize, cellsize, color);
 }
 
 void GolBoard::iterate() {
-    int aliveCells = 0;
     tmp_grid.clear();
     for (int i = 0; i < boardWidth*boardHeight; i++) {
         tmp_grid << 0;
@@ -40,19 +45,17 @@ void GolBoard::iterate() {
             /* Any live cell with two or three live neighbours
              * lives on */
             tmp_grid[n] = 1;
-            aliveCells++;
         } else if ((0 == grid.at(n)) && (3 == ncount)) {
           /* Any dead cell with exactly three live neighbours becomes
            * alive */
           tmp_grid[n] = 1;
-          aliveCells++;
         }
     }
     grid = tmp_grid;
 
     iteration++;
     emit changeLabel("iterationLabel", tr("Iterations: %1").arg(iteration));
-    emit changeLabel("aliveCellsLabel", tr("Alive cells: %1").arg(aliveCells));
+    emit changeLabel("aliveCellsLabel", tr("Alive cells: %1").arg(countAliveCells()));
 }
 
 void GolBoard::mouseMoveEvent(QMouseEvent *event) {
@@ -75,6 +78,7 @@ void GolBoard::mousePressEvent(QMouseEvent *event) {
         } else {
           grid[idx] = 1;
         }
+        emit changeLabel("aliveCellsLabel", tr("Alive cells: %1").arg(countAliveCells()));
         update();
     }
 }
@@ -143,12 +147,12 @@ void GolBoard::pause() {
 
 void GolBoard::populate() {
     grid.clear();
-    int aliveCells = 0;
+    iteration = 0;
     for (int i = 0; i < boardWidth*boardHeight; i++) {
         grid << (rand() < popRatio * static_cast<double>(RAND_MAX + 1.0));
-        if (grid[i] > 0) aliveCells++;
     }
-    emit changeLabel("aliveCellsLabel", tr("Alive cells: %1").arg(aliveCells));
+    emit changeLabel("iterationLabel", tr("Iterations: %1").arg(iteration));
+    emit changeLabel("aliveCellsLabel", tr("Alive cells: %1").arg(countAliveCells()));
     update();
 }
 
@@ -161,6 +165,7 @@ void GolBoard::reset() {
     timer.stop();
     iteration = 0;
     emit changeLabel("iterationLabel", tr("Iterations: %1").arg(iteration));
+    emit changeLabel("aliveCellsLabel", tr("Alive cells: %1").arg(countAliveCells()));
     emit checkPauseBtn();
     update();
 }

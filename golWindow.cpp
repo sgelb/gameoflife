@@ -110,7 +110,7 @@ void GolWindow::createPrefsBox(QGroupBox *prefsBox) {
     popRatioBox = new QSpinBox;
     popRatioBox->setRange(0, 100);
     popRatioBox->setSingleStep(1);
-    popRatioBox->setValue(30);
+    popRatioBox->setValue(40);
     popRatioBox->setSuffix("%");
     /* QPushButton *setBtn = new QPushButton(tr("Set")); */
 
